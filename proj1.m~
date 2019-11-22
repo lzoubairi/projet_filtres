@@ -58,19 +58,42 @@ title('Rss avec estimateur non biaisé');
 
 %Periodogramme de Daniell:
 
-pas = 0.5;
+pas = 5;
 l = length(Sss);
 
 tab_moy = zeros(l);
 
-for i=1:l-pas
-    s = 0;
+for i=pas+1:l-pas
+    sum = 0;
     for j=i-pas:i+pas
-        s = s + Sss(j);
+        sum = sum + Sss(j);
     end
-    tab_moy(i) = s/(2*pas);
+    tab_moy(i) = sum/(2*pas + 1);
 end
 
+figure;
+plot(tab_moy);
+title('Daniell');
+
+
+% Periodogramme de Welch:
+
+nsegment = 50; %nombre de décompositions du signal
+x = BBG;
+
+segmentsize = ceil(length(x) / nsegment);
+sumdsp= zeros(N,1);
+for k=0:1:nsegment-1
+   tmpfft = fftshift(fft(x([ k*segmentsize+1:(k+1)*segmentsize]),N));
+   sumdsp = sumdsp + abs(tmpfft).^2;
+end
+avgDSP = sumdsp/ nsegment;
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%Corrélogramme:
+% library(corrplot)
+% corrplot(BBG)

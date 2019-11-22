@@ -75,9 +75,10 @@ figure;
 plot(tab_moy);
 title('Daniell');
 
+
 % Periodogramme de Welch:
 
-nsegment = 50;
+nsegment = 50; %nombre de décompositions du signal
 x = BBG;
 
 segmentsize = ceil(length(x) / nsegment);
@@ -96,5 +97,5 @@ avgDSP = sumdsp/ nsegment;
 
 
 %Corrélogramme:
-library(corrplot)
-corrplot(BBG)
+% library(corrplot)
+% corrplot(BBG)
