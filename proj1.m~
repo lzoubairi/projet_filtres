@@ -24,32 +24,17 @@ title('BBG');
 
 
 %fonction autocorr théorique:
-Rss_th = 1/N * xcorr(BBG);
+Rss_th = xcorr(BBG);
 figure
 plot(Rss_th);
 title('autocorr théorique');
 
 
 %spectre de puissance:
-Sss = 1/N * abs(fftshift(fft(BBG))).^2;
+Sss = abs(fftshift(fft(BBG))).^2;
 figure
-plot(Sss);
+plot(Rss_th);
 title('spectre de puissance théorique');
 
 
 %fonction autocorr estimée:
-[C_biased,LAGS1] =xcorr(BBG,'biased'); %estimateur biaisé
-figure
-plot(C_biased);
-title('Sss avec estimateur biaisé');
-[C_unbiased,LAGS2] =xcorr(BBG,'unbiased'); %estimateur non biaisé
-figure
-plot(C_unbiased);
-title('Sss avec estimateur non biaisé');
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
