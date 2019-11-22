@@ -13,28 +13,64 @@ N = 500;
 m = 0;
 sigma = 1;
 var = sigma^2;
-tps = 0:10/(N-1):10;
+axet = 0:10/(N-1):10;
+axef = -1/2:1/N:1/2-1/N;
 
 
 %Bruit blanc gaussien
+
 BBG = m + var*randn(1,N);
 figure
-plot(tps, BBG);
+plot(axet, BBG);
 title('BBG');
 
 
 %fonction autocorr théorique:
-Rss_th = xcorr(BBG);
+
+Rss_th = 1/N * xcorr(BBG);
 figure
 plot(Rss_th);
 title('autocorr théorique');
 
 
 %spectre de puissance:
-Sss = abs(fftshift(fft(BBG))).^2;
+
+Sss = 1/N * abs(fftshift(fft(BBG))).^2;
 figure
-plot(Rss_th);
+plot(axef, Sss);
 title('spectre de puissance théorique');
 
 
 %fonction autocorr estimée:
+
+[C_biased,~] =xcorr(BBG,'biased'); %estimateur biaisé
+figure
+plot(C_biased);
+title('Rss avec estimateur biaisé');
+[C_unbiased,~] =xcorr(BBG,'unbiased'); %estimateur non biaisé
+figure
+plot(C_unbiased);
+title('Rss avec estimateur non biaisé');
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%Periodogramme de Daniell:
+
+pas = 0.5;
+l = length(Sss);
+
+tab_moy = zeros(l);
+
+for i=1:l-pas
+    s = 0;
+    for j=i-pas:i+pas
+        s = s + Sss(j);
+    end
+    tab_moy(i) = s/(2*pas);
+end
+
+
+
+
