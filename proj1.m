@@ -19,7 +19,7 @@ l = length(signal);
 sigma = 1;
 var = sigma^2;
 axet = 0:10/(l-1):10;
-axef = -1/2:1/N:1/2-1/N;
+axef = -1/2:1/l:1/2-1/l;
 
 
 %Bruit blanc gaussien
@@ -148,3 +148,44 @@ title('Spectrogramme de s bruité');
 %Corrélogramme:
 % library(corrplot)
 % corrplot(BBG)
+
+%% Décomposition du signal en trames:
+
+duree_t = 3e-3;
+fech = 8e3; % 8KHz
+Nech_t = duree_t*fech; %Nombre d'échantillons dans une trame
+rec = 0.5;
+Nb_t = Nech_t/rec*Nech_t-1; %Nombre total de trames
+
+% Initialisation matrice des trames:
+
+trames = zeros(Nb_t, Nech_t); %Matrice avec trame/ligne et 24ech/trame
+
+% Remplissage matrice des trames:
+
+fenetre = hanning(Nech_t)'; % Fenetrage par fenetre de Hanning
+
+for i=1:Nb_t      %Pour chaque trame
+    trames(i,:)=signal(((i-1)*Nech_t/2)+1:((i-1)*Nech_t/2)+Nech_t); %ligne i = trame n°i
+    trames(i,:)=trames(i,:).*fenetre; %puis on fenetre 
+end
+
+%% Reconstruction du signal d'origine:
+
+% sig_rec = zeros(Nb_t/2, l/Nech_t);
+% 
+% for i=0:Nb_t-1      %Pour chaque trame
+%     trames(i+1,:)=trames(i+1,:)./fenetre; %puis on Défenetre 
+%     %sig_res(i+1,:)=tra((i*Nech_t/2)+1:(i*Nech_t/2)+Nech_t);
+%     sig_rec(i+1,:) = 
+% end
+
+%% Methode 2.5:
+
+% Construction matrice de Hankel:
+
+% c = 
+% h = hankel(c,r):
+
+
+    
