@@ -170,7 +170,7 @@ for i=1:Nb_t      %Pour chaque trame
     trames(i,:)=trames(i,:).*fenetre; %puis on fenetre 
 end
 
-%% Reconstruction du signal d'origine:
+%% Reconstruction du signal d'origine: (à voir!!!)
 
 % sig_rec = zeros(Nb_t/2, l/Nech_t);
 % 
@@ -180,12 +180,27 @@ end
 %     sig_rec(i+1,:) = 
 % end
 
-%% Methode 2.5:
+%% Methode de rehaussement:
 
 % Construction matrice de Hankel:
 
-% c = 
-% h = hankel(c,r):
+M = 1/2 * Nech_t; %On choisit L la moitié des échantillons par trame
+L = Nech_t - M + 1;
+
+for i = 1:Nb_t %Pour chaque trame:
+    H = hankel(trames(i,1:L),trames(i,L:Nech_t));
+    
+    % Décomposition en valeurs singulières:
+    [U,S,V] = svd(H);
+    
+    % Trouver les k valeurs singulières dominantes:
+    
+    
+    
+end
+    
+
+
 
 
     

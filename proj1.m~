@@ -8,6 +8,7 @@ clc
 
 s = load("fcno04fz.mat");
 signal = s.fcno04fz; %57344x1
+signal = signal';
 % figure;
 % plot(signal);
 % title('signal de parole');
@@ -18,7 +19,7 @@ l = length(signal);
 sigma = 1;
 var = sigma^2;
 axet = 0:10/(l-1):10;
-axef = -1/2:1/N:1/2-1/N;
+axef = -1/2:1/l:1/2-1/l;
 
 
 %Bruit blanc gaussien
@@ -120,26 +121,81 @@ sigf3 = bruit_avec_RSB(signal, RSB3);
 
 %Affichage + spectrogramme du signal original:
 
+figure,
+
 subplot(2,1,1);
-figure;
 plot(axet,signal);
 title('Représentation temporelle de s');
 
 subplot(2,1,2);
-figure;
 spectrogram(signal);
 title('Spectrogramme de s');
 
 %Affichage signal bruité + spectrogramme:
 
+figure,
+
 subplot(2,1,1);
-plot(axet,signal);
-title('Représentation temporelle de s');
+plot(axet,sigf1);
+title('Représentation temporelle de s bruité');
 
 subplot(2,1,2);
-plot(spectrogram(signal), axet);
-title('Spectrogramme de s');
+spectrogram(sigf1);
+title('Spectrogramme de s bruité');
+
+
 
 %Corrélogramme:
 % library(corrplot)
 % corrplot(BBG)
+
+%% Décomposition du signal en trames:
+
+duree_t = 3e-3;
+fech = 8e3; % 8KHz
+Nech_t = duree_t*fech; %Nombre d'échantillons dans une trame
+rec = 0.5;
+Nb_t = Nech_t/rec*Nech_t-1; %Nombre total de trames
+
+% Initialisation matrice des trames:
+
+trames = zeros(Nb_t, Nech_t); %Matrice avec trame/ligne et 24ech/trame
+
+% Remplissage matrice des trames:
+
+fenetre = hanning(Nech_t)'; % Fenetrage par fenetre de Hanning
+
+for i=1:Nb_t      %Pour chaque trame
+    trames(i,:)=signal(((i-1)*Nech_t/2)+1:((i-1)*Nech_t/2)+Nech_t); %ligne i = trame n°i
+    trames(i,:)=trames(i,:).*fenetre; %puis on fenetre 
+end
+
+%% Reconstruction du signal d'origine: (à voir!!!)
+
+% sig_rec = zeros(Nb_t/2, l/Nech_t);
+% 
+% for i=0:Nb_t-1      %Pour chaque trame
+%     trames(i+1,:)=trames(i+1,:)./fenetre; %puis on Défenetre 
+%     %sig_res(i+1,:)=tra((i*Nech_t/2)+1:(i*Nech_t/2)+Nech_t);
+%     sig_rec(i+1,:) = 
+% end
+
+%% Methode de rehaussement:
+
+% Construction matrice de Hankel:
+
+M = 1/2 * Nech_t; %On choisit L la moitié des échantillons par trame
+L = Nech_t - M + 1;
+
+for i = 1:Nb_t %Pour chaque trame:
+    H = hankel(trames(i,1:L),trames(i,L:Nech_t));
+    % Décomposition en valeurs singulières:
+    [U,S,V] = svd(H)
+    
+
+
+% c = 
+% h = hankel(c,r):
+
+
+    
