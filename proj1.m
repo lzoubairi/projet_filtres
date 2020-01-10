@@ -9,53 +9,54 @@ clc
 s = load("fcno04fz.mat");
 signal = s.fcno04fz; %57344x1
 signal = signal';
-% figure;
-% plot(signal);
-% title('signal de parole');
+
+figure;
+plot(signal);
+title('signal de parole');
 
 N = 500;
 m = 0;
 l = length(signal);
 sigma = 1;
 var = sigma^2;
-axet = 0:10/(l-1):10;
-axef = -1/2:1/l:1/2-1/l;
+axet = 0:10/(N-1):10;
+axef = -1/2:1/N:1/2-1/N;
 
 
 %Bruit blanc gaussien
 
 BBG = m + var*randn(1,N);
-% figure
-% plot(axet, BBG);
-% title('BBG');
+figure
+plot(axet, BBG);
+title('BBG');
 
 
 %fonction autocorr théorique:
 
 Rss_th = 1/N * xcorr(BBG);
-% figure
-% plot(Rss_th);
-% title('autocorr théorique');
+figure
+plot(Rss_th);
+title('autocorr théorique');
 
 
 %spectre de puissance:
 
 Sss = 1/N * abs(fftshift(fft(BBG))).^2;
-% figure
-% plot(axef, Sss);
-% title('spectre de puissance théorique');
+figure
+plot(axef, Sss);
+title('spectre de puissance théorique');
 
 
 %fonction autocorr estimée:
 
-% [C_biased,~] =xcorr(BBG,'biased'); %estimateur biaisé
-% figure
-% plot(C_biased);
-% title('Rss avec estimateur biaisé');
-% [C_unbiased,~] =xcorr(BBG,'unbiased'); %estimateur non biaisé
-% figure
-% plot(C_unbiased);
-% title('Rss avec estimateur non biaisé');
+[C_biased,~] =xcorr(BBG,'biased'); %estimateur biaisé
+figure
+plot(C_biased);
+title('Rss avec estimateur biaisé');
+[C_unbiased,~] =xcorr(BBG,'unbiased'); %estimateur non biaisé
+figure
+plot(C_unbiased);
+title('Rss avec estimateur non biaisé');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,26 +65,26 @@ Sss = 1/N * abs(fftshift(fft(BBG))).^2;
 %Fonction MATLAB Pwelch:
 
 
-% figure;
-% plot(pwelch(BBG));
-% title('pwelch');
+figure;
+plot(pwelch(BBG));
+title('pwelch');
 
 
 %Periodogramme de Daniell:
 
 pas = 5;
-l = length(Sss);
+len_sss = length(Sss);
 
-tab_moy = zeros(l);
+tab_moy = zeros(len_sss);
 
-for i=pas+1:l-pas
+for i=pas+1:len_sss-pas
     sum = 0;
     for j=i-pas:i+pas
         sum = sum + Sss(j);
     end
     tab_moy(i) = sum/(2*pas + 1);
 end
-
+% 
 % figure;
 % plot(axef, tab_moy);
 % title('Daniell spectrogram');
@@ -124,7 +125,7 @@ sigf3 = bruit_avec_RSB(signal, RSB3);
 figure,
 
 subplot(2,1,1);
-plot(axet,signal);
+plot(signal);
 title('Représentation temporelle de s');
 
 subplot(2,1,2);
@@ -136,7 +137,7 @@ title('Spectrogramme de s');
 figure,
 
 subplot(2,1,1);
-plot(axet,sigf1);
+plot(sigf1);
 title('Représentation temporelle de s bruité');
 
 subplot(2,1,2);
@@ -154,7 +155,7 @@ title('Spectrogramme de s bruité');
 duree_t = 3e-3;
 fech = 8e3; % 8KHz
 Nech_t = duree_t*fech; %Nombre d'échantillons dans une trame
-rec = 0.5;
+rec = 0.5; %taux de recouvrement
 Nb_t = Nech_t/rec*Nech_t-1; %Nombre total de trames
 
 % Initialisation matrice des trames:
@@ -170,33 +171,43 @@ for i=1:Nb_t      %Pour chaque trame
     trames(i,:)=trames(i,:).*fenetre; %puis on fenetre 
 end
 
-%% Reconstruction du signal d'origine: (à voir!!!)
-
-% sig_rec = zeros(Nb_t/2, l/Nech_t);
-% 
-% for i=0:Nb_t-1      %Pour chaque trame
-%     trames(i+1,:)=trames(i+1,:)./fenetre; %puis on Défenetre 
-%     %sig_res(i+1,:)=tra((i*Nech_t/2)+1:(i*Nech_t/2)+Nech_t);
-%     sig_rec(i+1,:) = 
-% end
 
 %% Methode de rehaussement:
 
 % Construction matrice de Hankel:
 
-M = 1/2 * Nech_t; %On choisit L la moitié des échantillons par trame
+M = 1/3 * Nech_t; %On choisit M le tiers des échantillons par trame
 L = Nech_t - M + 1;
 
 for i = 1:Nb_t %Pour chaque trame:
     H = hankel(trames(i,1:L),trames(i,L:Nech_t));
     
     % Décomposition en valeurs singulières:
+    
     [U,S,V] = svd(H);
     
-    % Trouver les k valeurs singulières dominantes:
+    % Trouver les K valeurs singulières dominantes:
     
-    
-    
+    len_s = size(S(1,:));
+    len_s = len_s(2);
+    %Calcul du nombre des vs dominantes:
+    somme = 0;
+    seuil = 1000; %Seuil défini avec la matrice S
+    for v = 1:len_s
+        if S(v,v) >= seuil
+            somme = somme + 1;
+%             v
+        end
+        
+    end
+    % Stockage des vs dominantes:
+    dom = 0;
+    for u=1:somme
+        if S(u,u) >= seuil
+            dom = [dom;S(u,u)];
+        end
+    end
+    dom = dom(2:somme+1,1);
 end
     
 

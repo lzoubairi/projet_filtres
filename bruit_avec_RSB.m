@@ -1,4 +1,4 @@
-function sigf = bruit_avec_RSB(sig0, RSB) %RSB en dB
+function [sigf, var] = bruit_avec_RSB(sig0, RSB) %RSB en dB                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 function sigf = bruit_avec_RSB(sig0, RSB) %RSB en dB
 
     l = length(sig0);
     bruit=randn(1, l);
